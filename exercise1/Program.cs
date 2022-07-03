@@ -22,7 +22,7 @@ public static class Program
             this.Name = x;
             this.ID = Guid.NewGuid(); ;
         }
-        public string display()
+        public string Display()
         {
             return "this category has a name : " + this.Name;
         }
@@ -45,7 +45,7 @@ public static class Program
             this.Instructions = instructions;
             this.Categories = categories;
         }
-        public string display(Dictionary<Guid, string> categoriesNamesMap)
+        public string Display(Dictionary<Guid, string> categoriesNamesMap)
         {
             string toDisplay = "this receipe is called :" + this.Title + ", to do it we need: " + this.Ingredients + ", the instructions are: " + this.Instructions;
             for (int i = 0; i < this.Categories.Count; i++)
@@ -72,7 +72,7 @@ public static class Program
     }
 
 
-    public static void writeInFolder(string text, string path)
+    public static void WriteInFolder(string text, string path)
     {
 
         using (StreamWriter writer = new StreamWriter(path))
@@ -80,7 +80,7 @@ public static class Program
             writer.WriteLine(text);
         }
     }
-    public static string listCategories(List<Category> categories)
+    public static string ListCategories(List<Category> categories)
     {
         string categoriesString = "";
         for (int i = 0; i < categories.Count; i++)
@@ -88,12 +88,12 @@ public static class Program
             categoriesString += "at index ";
             categoriesString += i;
             categoriesString += " ";
-            categoriesString += categories[i].display();
+            categoriesString += categories[i].Display();
             categoriesString += "\n\n";
         }
         return categoriesString;
     }
-    public static string listrecipes(List<Recipe> receipes, Dictionary<Guid, string> categoriesNamesMap)
+    public static string ListRecipes(List<Recipe> receipes, Dictionary<Guid, string> categoriesNamesMap)
     {
         string receipesString = "";
         for (int i = 0; i < receipes.Count; i++)
@@ -101,7 +101,7 @@ public static class Program
             receipesString += "at index ";
             receipesString += i;
             receipesString += " ";
-            receipesString += receipes[i].display(categoriesNamesMap);
+            receipesString += receipes[i].Display(categoriesNamesMap);
             receipesString += "\n\n";
         }
         return receipesString;
@@ -129,8 +129,8 @@ public static class Program
         string recipesString = File.ReadAllText(recipesLoc);
         var recipes = JsonSerializer.Deserialize<List<Recipe>>(recipesString);
         var options = new JsonSerializerOptions { WriteIndented = true };
-        bool coninue = true;
-        while (coninue)
+        bool continueCode = true;
+        while (continueCode)
         {
 
             switch (mainMenuChoice)
@@ -148,7 +148,7 @@ public static class Program
                             switch (backChoice)
                             {
                                 case null:
-                                    string recipesStringToEdit = listrecipes(recipes,categoriesNamesMap);
+                                    string recipesStringToEdit = ListRecipes(recipes,categoriesNamesMap);
                                     AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(recipesStringToEdit));
                                     backChoice = Select(new[] { "Back" });
                                     break;
@@ -186,7 +186,7 @@ public static class Program
                                     }
                                     Recipe to_add = new Recipe(title, ingredients, instructions, chosenCategoriesFinal);
                                     recipes.Add(to_add);
-                                    writeInFolder(JsonSerializer.Serialize(recipes, options), recipesLoc);
+                                    WriteInFolder(JsonSerializer.Serialize(recipes, options), recipesLoc);
                                     backChoice = "Back";
                                     break;
                                 case "Back":
@@ -201,7 +201,7 @@ public static class Program
                             switch (backChoice)
                             {
                                 case null:
-                                    string recipesStringToEdit = listrecipes(recipes,categoriesNamesMap);
+                                    string recipesStringToEdit = ListRecipes(recipes,categoriesNamesMap);
                                     AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(recipesStringToEdit));
                                     var index = -1;
                                     while (index < 0 || index >= recipes.Count)
@@ -229,7 +229,7 @@ public static class Program
                                     }
                                     Recipe to_edit = new Recipe(title, ingredients, instructions, chosenCategoriesFinal);
                                     recipes[index] = to_edit;
-                                    writeInFolder(JsonSerializer.Serialize(recipes, options), recipesLoc);
+                                    WriteInFolder(JsonSerializer.Serialize(recipes, options), recipesLoc);
                                     backChoice = "Back";
                                     break;
                                 case "Back":
@@ -287,7 +287,7 @@ public static class Program
                                     categories.Add(to_add);
                                     categoriesMap[name] = to_add.ID;
                                     categoriesNamesMap[to_add.ID] = to_add.Name;
-                                    writeInFolder(JsonSerializer.Serialize(categories, options), categoriesLoc);
+                                    WriteInFolder(JsonSerializer.Serialize(categories, options), categoriesLoc);
                                     backChoice = "Back";
                                     break;
                                 case "Back":
@@ -302,7 +302,7 @@ public static class Program
                             switch (backChoice)
                             {
                                 case null:
-                                    string categoriesStringToEdit = listCategories(categories);
+                                    string categoriesStringToEdit = ListCategories(categories);
                                     AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(categoriesStringToEdit));
                                     var index = -1;
                                     while (index < 0 || index >= categories.Count)
@@ -322,7 +322,7 @@ public static class Program
                                     categories[index].Name = name;
                                     categoriesMap[categories[index].Name] = categories[index].ID;
                                     categoriesNamesMap[categories[index].ID] = categories[index].Name;
-                                    writeInFolder(JsonSerializer.Serialize(categories, options), categoriesLoc);
+                                    WriteInFolder(JsonSerializer.Serialize(categories, options), categoriesLoc);
                                     backChoice = "Back";
                                     break;
                                 case "Back":
@@ -342,7 +342,7 @@ public static class Program
                     }
                     break;
                 case "Close program":
-                    coninue = false;
+                    continueCode = false;
                     break;
                 default:
                     break;

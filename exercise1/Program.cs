@@ -7,24 +7,24 @@ using System;
 //using Newtonsoft.Json;
 public static class Program
 {
-    public static Dictionary<Guid, string> categoriesNamesMap = new Dictionary<Guid, string>();
 
     public class Category
     {
-        public string name { get; set; }
-        public Guid id { get; set; }
+        public string Name { get; set; }
+        public Guid ID { get; set; }
+
         public Category()
         {
 
         }
         public Category(string x)
         {
-            this.name = x;
-            this.id = Guid.NewGuid(); ;
+            this.Name = x;
+            this.ID = Guid.NewGuid(); ;
         }
         public string display()
         {
-            return "this category has a name : " + this.name;
+            return "this category has a name : " + this.Name;
         }
     }
     public class Recipe
@@ -33,7 +33,7 @@ public static class Program
         public string Ingredients { get; set; }
         public string Instructions { get; set; }
         public List<Guid> Categories { get; set; }
-        //Category[] Categories{ get;set; }
+
         public Recipe()
         {
 
@@ -45,7 +45,7 @@ public static class Program
             this.Instructions = instructions;
             this.Categories = categories;
         }
-        public string display()
+        public string display(Dictionary<Guid, string> categoriesNamesMap)
         {
             string toDisplay = "this receipe is called :" + this.Title + ", to do it we need: " + this.Ingredients + ", the instructions are: " + this.Instructions;
             for (int i = 0; i < this.Categories.Count; i++)
@@ -67,7 +67,6 @@ public static class Program
         var choice = AnsiConsole.Prompt(new SelectionPrompt<string>()
         .Title(title)
         .PageSize(10)
-        //.MoreChoicesText("[grey](Move up and down to reveal more fruits)[/]")
         .AddChoices(choices));
         return choice;
     }
@@ -94,7 +93,7 @@ public static class Program
         }
         return categoriesString;
     }
-    public static string listrecipes(List<Recipe> receipes)
+    public static string listrecipes(List<Recipe> receipes, Dictionary<Guid, string> categoriesNamesMap)
     {
         string receipesString = "";
         for (int i = 0; i < receipes.Count; i++)
@@ -102,7 +101,7 @@ public static class Program
             receipesString += "at index ";
             receipesString += i;
             receipesString += " ";
-            receipesString += receipes[i].display();
+            receipesString += receipes[i].display(categoriesNamesMap);
             receipesString += "\n\n";
         }
         return receipesString;
@@ -114,45 +113,22 @@ public static class Program
         string? categoryChoice = null;
         string? recipeChoice = null;
         string? backChoice = null;
-
-        //Category c1 = new Category("sweet");
-        //Category c2 = new Category("pizza");
-        //Category c3 = new Category("pasta");
-        //List<Category> categories = new List<Category>() { c1, c2, c3 };
-
         string mainPath = Environment.CurrentDirectory;
         string categoriesLoc = $@"{mainPath}\..\..\..\..\categories.json";
         string categoriesString = File.ReadAllText(categoriesLoc);
         var categories = JsonSerializer.Deserialize<List<Category>>(categoriesString);
         Dictionary<string, Guid?> categoriesMap = new Dictionary<string, Guid?>();
+        Dictionary<Guid, string> categoriesNamesMap = new Dictionary<Guid, string>();
+
         for (int i = 0; i < categories.Count; i++)
         {
-            categoriesMap[categories[i].name] = categories[i].id;
-            categoriesNamesMap[categories[i].id] = categories[i].name;
+            categoriesMap[categories[i].Name] = categories[i].ID;
+            categoriesNamesMap[categories[i].ID] = categories[i].Name;
         }
-
-
         string recipesLoc = $@"{mainPath}\..\..\..\..\recipes.json";
         string recipesString = File.ReadAllText(recipesLoc);
         var recipes = JsonSerializer.Deserialize<List<Recipe>>(recipesString);
-
-
-
-        //Recipe r1 = new Recipe("sweet", "sweet", "sweet", new List<Guid> { });
-        //Recipe r2 = new Recipe("sweet", "sweet", "sweet", new List<Guid> { });
-        //Recipe r3 = new Recipe("sweet", "sweet", "sweet", new List<Guid> { });
-        //List<Recipe> recipes = new List<Recipe>() { r1, r2, r3 };
-        //writeInFolder(JsonSerializer.Serialize(recipes, new JsonSerializerOptions { WriteIndented = true }), recipesLoc);
-
-        //jsonconvert.deserializeobject<list<category>>(json)
-
-        //List<Category> categories = new();
-        //categories[0] = c1;
-        //categories[1] = c2;
-        //categories[2] = c3;
         var options = new JsonSerializerOptions { WriteIndented = true };
-
-
         bool coninue = true;
         while (coninue)
         {
@@ -169,12 +145,10 @@ public static class Program
                             recipeChoice = Select(new[] { "List", "Add", "Edit", "Bact to main menu" }, "what would you like to do with recipes?");
                             break;
                         case "List":
-                            //AnsiConsole.Write(new FigletText("Listing Recipe").Centered().Color(Color.Grey));
                             switch (backChoice)
                             {
                                 case null:
-                                    //AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(File.ReadAllText(recipesLoc)));
-                                    string recipesStringToEdit = listrecipes(recipes);
+                                    string recipesStringToEdit = listrecipes(recipes,categoriesNamesMap);
                                     AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(recipesStringToEdit));
                                     backChoice = Select(new[] { "Back" });
                                     break;
@@ -193,18 +167,12 @@ public static class Program
                                     var title = AnsiConsole.Ask<string>("What's the recipe title?");
                                     var ingredients = AnsiConsole.Ask<string>("What's the recipe ingredients?");
                                     var instructions = AnsiConsole.Ask<string>("What's the recipe instructions?");
-                                    ////string[] CategoriesNames = new string[] { };
-                                    //for(int i = 0; i < categoriesString.Length;i++)
-                                    //{
-                                    //    CategoriesNames[i] = Categories[i].name;
-                                    //}
-                                    var categoryNames = categories.Select(x => x.name).ToArray();
+                                    var categoryNames = categories.Select(x => x.Name).ToArray();
                                     var chosenCategories = AnsiConsole.Prompt(
                                          new MultiSelectionPrompt<string>()
                                              .Title("What are your [green]favorite fruits[/]?")
-                                             .NotRequired() // Not required to have a favorite fruit
+                                             .NotRequired()
                                              .PageSize(10)
-                                             //.MoreChoicesText("[grey](Move up and down to reveal more fruits)[/]")
                                              .InstructionsText(
                                                  "[grey](Press [blue]<space>[/] to toggle a fruit, " +
                                                  "[green]<enter>[/] to accept)[/]")
@@ -233,7 +201,7 @@ public static class Program
                             switch (backChoice)
                             {
                                 case null:
-                                    string recipesStringToEdit = listrecipes(recipes);
+                                    string recipesStringToEdit = listrecipes(recipes,categoriesNamesMap);
                                     AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(recipesStringToEdit));
                                     var index = -1;
                                     while (index < 0 || index >= recipes.Count)
@@ -243,21 +211,18 @@ public static class Program
                                     var title = AnsiConsole.Ask<string>("What's the recipe new title?");
                                     var ingredients = AnsiConsole.Ask<string>("What's the recipe new ingredients?");
                                     var instructions = AnsiConsole.Ask<string>("What's the recipe new instructions?");
-                                    var categoryNames = categories.Select(x => x.name).ToArray();
+                                    var categoryNames = categories.Select(x => x.Name).ToArray();
                                     var chosenCategories = AnsiConsole.Prompt(
                                         new MultiSelectionPrompt<string>()
                                             .Title("What are your [green]favorite fruits[/]?")
-                                            .NotRequired() // Not required to have a favorite fruit
+                                            .NotRequired()
                                             .PageSize(10)
-                                            //.MoreChoicesText("[grey](Move up and down to reveal more fruits)[/]")
                                             .InstructionsText(
                                                 "[grey](Press [blue]<space>[/] to toggle a fruit, " +
                                                 "[green]<enter>[/] to accept)[/]")
                                             .AddChoices(categoryNames));
 
-                                    // Write the selected fruits to the terminal
                                     List<Guid> chosenCategoriesFinal = new List<Guid> { };
-
                                     for (int i = 0; i < chosenCategories.Count; i++)
                                     {
                                         chosenCategoriesFinal.Add(categoriesMap[chosenCategories[i]].Value);
@@ -275,25 +240,21 @@ public static class Program
                                     break;
                             }
                             break;
-
                         case "Bact to main menu":
                             mainMenuChoice = null;
                             recipeChoice = null;
                             break;
                         default:
                             break;
-
                     }
                     break;
                 case "Categories":
-
                     switch (categoryChoice)
                     {
                         case null:
                             categoryChoice = Select(new[] { "List", "Add", "Edit", "Bact to main menu" }, "what would you like to do with categories?");
                             break;
                         case "List":
-                            //AnsiConsole.Write(new FigletText("Listing Recipe").Centered().Color(Color.Grey));
                             switch (backChoice)
                             {
                                 case null:
@@ -324,8 +285,8 @@ public static class Program
                                     catch (Exception e) { }
                                     Category to_add = new Category(name);
                                     categories.Add(to_add);
-                                    categoriesMap[name] = to_add.id;
-                                    categoriesNamesMap[to_add.id] = to_add.name;
+                                    categoriesMap[name] = to_add.ID;
+                                    categoriesNamesMap[to_add.ID] = to_add.Name;
                                     writeInFolder(JsonSerializer.Serialize(categories, options), categoriesLoc);
                                     backChoice = "Back";
                                     break;
@@ -348,7 +309,7 @@ public static class Program
                                     {
                                         index = int.Parse(AnsiConsole.Ask<string>("choose an index to edit"));
                                     }
-                                    categoriesMap[categories[index].name] = null;
+                                    categoriesMap[categories[index].Name] = null;
                                     var name = AnsiConsole.Ask<string>("What's the category new name?").ToLower().Trim();
                                     try
                                     {
@@ -358,11 +319,9 @@ public static class Program
                                         }
                                     }
                                     catch (Exception e) { }
-                                    //Category to_edit = new Category(name);
-                                    categories[index].name = name;
-                                    categoriesMap[categories[index].name] = categories[index].id;
-                                    categoriesNamesMap[categories[index].id] = categories[index].name;
-
+                                    categories[index].Name = name;
+                                    categoriesMap[categories[index].Name] = categories[index].ID;
+                                    categoriesNamesMap[categories[index].ID] = categories[index].Name;
                                     writeInFolder(JsonSerializer.Serialize(categories, options), categoriesLoc);
                                     backChoice = "Back";
                                     break;
@@ -380,18 +339,14 @@ public static class Program
                             break;
                         default:
                             break;
-
                     }
                     break;
                 case "Close program":
                     coninue = false;
                     break;
                 default:
-
                     break;
             }
         }
-
-
     }
 }

@@ -150,8 +150,26 @@ public static class Program
                             switch (backChoice)
                             {
                                 case "":
-                                    string recipesStringToEdit = ListRecipes(recipes, categoriesNamesMap);
-                                    AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(recipesStringToEdit));
+                                    var table = new Table();
+                                    table.AddColumn("Title");
+                                    table.AddColumn("Ingredients");
+                                    table.AddColumn("Instructions");
+                                    table.AddColumn("categoties");
+                                    foreach (Recipe r in recipes)
+                                    {
+                                        string categoriesTable = "";
+                                        int counter = 0;
+                                        foreach (Guid g in r.Categories)
+                                        {
+                                            counter++;
+                                            categoriesTable += categoriesNamesMap[g];
+                                            if(counter<r.Categories.Count)
+                                            categoriesTable += "\n";
+                                        }
+                                        // Add some rows
+                                        table.AddRow(new Markup(r.Title), new Markup(r.Ingredients), new Markup(r.Instructions), new Panel(categoriesTable));
+                                    }
+                                    AnsiConsole.Write(table);
                                     backChoice = Select(new[] { "Back" });
                                     break;
                                 case "Back":
@@ -201,8 +219,30 @@ public static class Program
                             switch (backChoice)
                             {
                                 case "":
-                                    string recipesStringToEdit = ListRecipes(recipes, categoriesNamesMap);
-                                    AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(recipesStringToEdit));
+                                    var table = new Table();
+                                    table.AddColumn("index");
+                                    table.AddColumn("Title");
+                                    table.AddColumn("Ingredients");
+                                    table.AddColumn("Instructions");
+                                    table.AddColumn("categoties");
+                                    int indexer = 0;
+
+                                    foreach (Recipe r in recipes)
+                                    {
+                                        string categoriesTable = "";
+                                        int counter = 0;
+                                        foreach (Guid g in r.Categories)
+                                        {
+                                            counter++;
+                                            categoriesTable += categoriesNamesMap[g];
+                                            if (counter < r.Categories.Count)
+                                                categoriesTable += "\n";
+                                        }
+                                        // Add some rows
+                                        table.AddRow(new Markup(indexer.ToString()),new Markup(r.Title), new Markup(r.Ingredients), new Markup(r.Instructions), new Panel(categoriesTable));
+                                        indexer++;
+                                    }
+                                    AnsiConsole.Write(table);
                                     var index = -1;
                                     while (index < 0 || index >= recipes.Count)
                                     {
@@ -257,7 +297,14 @@ public static class Program
                             switch (backChoice)
                             {
                                 case "":
-                                    AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(File.ReadAllText(categoriesLoc)));
+                                    var table = new Table();
+                                    table.AddColumn("ID");
+                                    table.AddColumn("Name");
+                                    foreach (Category c in categories)
+                                    {
+                                        table.AddRow(c.ID.ToString(), c.Name);
+                                    }
+                                    AnsiConsole.Write(table);
                                     backChoice = Select(new[] { "Back" });
                                     break;
                                 case "Back":
@@ -301,8 +348,16 @@ public static class Program
                             switch (backChoice)
                             {
                                 case "":
-                                    string categoriesStringToEdit = ListCategories(categories);
-                                    AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(categoriesStringToEdit));
+                                    var table = new Table();
+                                    table.AddColumn("index");
+                                    table.AddColumn("Name");
+                                    int counter = 0;
+                                    foreach (Category c in categories)
+                                    {
+                                        table.AddRow(counter.ToString(), c.Name);
+                                        counter++;
+                                    }
+                                    AnsiConsole.Write(table);
                                     var index = -1;
                                     while (index < 0 || index >= categories.Count)
                                     {

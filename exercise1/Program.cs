@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System;
-//using Newtonsoft.Json;
 public static class Program
 {
 
@@ -109,15 +108,15 @@ public static class Program
     public static void Main(string[] args)
     {
         AnsiConsole.Write(new FigletText("Mena Lateaf").Centered().Color(Color.Grey));
-        string? mainMenuChoice = null;
-        string? categoryChoice = null;
-        string? recipeChoice = null;
-        string? backChoice = null;
+        string mainMenuChoice = string.Empty;
+        string categoryChoice = string.Empty;
+        string recipeChoice = string.Empty;
+        string backChoice = string.Empty;
         string mainPath = Environment.CurrentDirectory;
         string categoriesLoc = $@"{mainPath}\..\..\..\..\categories.json";
         string categoriesString = File.ReadAllText(categoriesLoc);
         var categories = JsonSerializer.Deserialize<List<Category>>(categoriesString);
-        Dictionary<string, Guid?> categoriesMap = new Dictionary<string, Guid?>();
+        Dictionary<string, Guid> categoriesMap = new Dictionary<string, Guid>();
         Dictionary<Guid, string> categoriesNamesMap = new Dictionary<Guid, string>();
 
         for (int i = 0; i < categories.Count; i++)
@@ -132,29 +131,28 @@ public static class Program
         bool continueCode = true;
         while (continueCode)
         {
-
             switch (mainMenuChoice)
             {
-                case null:
+                case "":
                     mainMenuChoice = Select(new[] { "Recipes", "Categories", "Close program" }, "which struct would you like to deal with ?");
                     break;
                 case "Recipes":
                     switch (recipeChoice)
                     {
-                        case null:
+                        case "":
                             recipeChoice = Select(new[] { "List", "Add", "Edit", "Bact to main menu" }, "what would you like to do with recipes?");
                             break;
                         case "List":
                             switch (backChoice)
                             {
-                                case null:
+                                case "":
                                     string recipesStringToEdit = ListRecipes(recipes,categoriesNamesMap);
                                     AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(recipesStringToEdit));
                                     backChoice = Select(new[] { "Back" });
                                     break;
                                 case "Back":
-                                    backChoice = null;
-                                    recipeChoice = null;
+                                    backChoice = "";
+                                    recipeChoice = "";
                                     break;
                                 default:
                                     break;
@@ -163,26 +161,24 @@ public static class Program
                         case "Add":
                             switch (backChoice)
                             {
-                                case null:
+                                case "":
                                     var title = AnsiConsole.Ask<string>("What's the recipe title?");
                                     var ingredients = AnsiConsole.Ask<string>("What's the recipe ingredients?");
                                     var instructions = AnsiConsole.Ask<string>("What's the recipe instructions?");
                                     var categoryNames = categories.Select(x => x.Name).ToArray();
                                     var chosenCategories = AnsiConsole.Prompt(
                                          new MultiSelectionPrompt<string>()
-                                             .Title("What are your [green]favorite fruits[/]?")
+                                             .Title("What are your [green]the recipe categories[/]?")
                                              .NotRequired()
                                              .PageSize(10)
                                              .InstructionsText(
-                                                 "[grey](Press [blue]<space>[/] to toggle a fruit, " +
+                                                 "[grey](Press [blue]<space>[/] to toggle a category, " +
                                                  "[green]<enter>[/] to accept)[/]")
                                              .AddChoices(categoryNames));
-
                                     List<Guid> chosenCategoriesFinal = new List<Guid> { };
-
                                     for (int i = 0; i < chosenCategories.Count; i++)
                                     {
-                                        chosenCategoriesFinal.Add(categoriesMap[chosenCategories[i]].Value);
+                                        chosenCategoriesFinal.Add(categoriesMap[chosenCategories[i]]);
                                     }
                                     Recipe to_add = new Recipe(title, ingredients, instructions, chosenCategoriesFinal);
                                     recipes.Add(to_add);
@@ -190,8 +186,8 @@ public static class Program
                                     backChoice = "Back";
                                     break;
                                 case "Back":
-                                    backChoice = null;
-                                    recipeChoice = null;
+                                    backChoice = "";
+                                    recipeChoice = "";
                                     break;
                                 default:
                                     break;
@@ -200,7 +196,7 @@ public static class Program
                         case "Edit":
                             switch (backChoice)
                             {
-                                case null:
+                                case "":
                                     string recipesStringToEdit = ListRecipes(recipes,categoriesNamesMap);
                                     AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(recipesStringToEdit));
                                     var index = -1;
@@ -214,18 +210,17 @@ public static class Program
                                     var categoryNames = categories.Select(x => x.Name).ToArray();
                                     var chosenCategories = AnsiConsole.Prompt(
                                         new MultiSelectionPrompt<string>()
-                                            .Title("What are your [green]favorite fruits[/]?")
+                                            .Title("What are your [green]the recipe categories[/]?")
                                             .NotRequired()
                                             .PageSize(10)
                                             .InstructionsText(
-                                                "[grey](Press [blue]<space>[/] to toggle a fruit, " +
+                                                "[grey](Press [blue]<space>[/] to toggle a category, " +
                                                 "[green]<enter>[/] to accept)[/]")
                                             .AddChoices(categoryNames));
-
                                     List<Guid> chosenCategoriesFinal = new List<Guid> { };
                                     for (int i = 0; i < chosenCategories.Count; i++)
                                     {
-                                        chosenCategoriesFinal.Add(categoriesMap[chosenCategories[i]].Value);
+                                        chosenCategoriesFinal.Add(categoriesMap[chosenCategories[i]]);
                                     }
                                     Recipe to_edit = new Recipe(title, ingredients, instructions, chosenCategoriesFinal);
                                     recipes[index] = to_edit;
@@ -233,16 +228,16 @@ public static class Program
                                     backChoice = "Back";
                                     break;
                                 case "Back":
-                                    backChoice = null;
-                                    recipeChoice = null;
+                                    backChoice = "";
+                                    recipeChoice = "";
                                     break;
                                 default:
                                     break;
                             }
                             break;
                         case "Bact to main menu":
-                            mainMenuChoice = null;
-                            recipeChoice = null;
+                            mainMenuChoice = "";
+                            recipeChoice = "";
                             break;
                         default:
                             break;
@@ -251,19 +246,19 @@ public static class Program
                 case "Categories":
                     switch (categoryChoice)
                     {
-                        case null:
+                        case "":
                             categoryChoice = Select(new[] { "List", "Add", "Edit", "Bact to main menu" }, "what would you like to do with categories?");
                             break;
                         case "List":
                             switch (backChoice)
                             {
-                                case null:
+                                case "":
                                     AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(File.ReadAllText(categoriesLoc)));
                                     backChoice = Select(new[] { "Back" });
                                     break;
                                 case "Back":
-                                    backChoice = null;
-                                    categoryChoice = null;
+                                    backChoice = "";
+                                    categoryChoice = "";
                                     break;
                                 default:
                                     break;
@@ -272,11 +267,11 @@ public static class Program
                         case "Add":
                             switch (backChoice)
                             {
-                                case null:
+                                case "":
                                     var name = AnsiConsole.Ask<string>("What's the category name?").ToLower().Trim();
                                     try
                                     {
-                                        while (categoriesMap[name] != null)
+                                        while (categoriesMap.ContainsKey(null))
                                         {
                                             name = AnsiConsole.Ask<string>("this category name already exists, Enter neew one please. ").ToLower().Trim();
 
@@ -291,8 +286,8 @@ public static class Program
                                     backChoice = "Back";
                                     break;
                                 case "Back":
-                                    backChoice = null;
-                                    categoryChoice = null;
+                                    backChoice = "";
+                                    categoryChoice = "";
                                     break;
                                 default:
                                     break;
@@ -301,7 +296,7 @@ public static class Program
                         case "Edit":
                             switch (backChoice)
                             {
-                                case null:
+                                case "":
                                     string categoriesStringToEdit = ListCategories(categories);
                                     AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(categoriesStringToEdit));
                                     var index = -1;
@@ -309,11 +304,11 @@ public static class Program
                                     {
                                         index = int.Parse(AnsiConsole.Ask<string>("choose an index to edit"));
                                     }
-                                    categoriesMap[categories[index].Name] = null;
+                                    categoriesMap.Remove(categories[index].Name);
                                     var name = AnsiConsole.Ask<string>("What's the category new name?").ToLower().Trim();
                                     try
                                     {
-                                        while (categoriesMap[name] != null)
+                                        while (categoriesMap.ContainsKey(name))
                                         {
                                             name = AnsiConsole.Ask<string>("this category name already exists, Enter neew one please. ").ToLower().Trim();
                                         }
@@ -326,16 +321,16 @@ public static class Program
                                     backChoice = "Back";
                                     break;
                                 case "Back":
-                                    backChoice = null;
-                                    categoryChoice = null;
+                                    backChoice = "";
+                                    categoryChoice = "";
                                     break;
                                 default:
                                     break;
                             }
                             break;
                         case "Bact to main menu":
-                            mainMenuChoice = null;
-                            categoryChoice = null;
+                            mainMenuChoice = "";
+                            categoryChoice = "";
                             break;
                         default:
                             break;

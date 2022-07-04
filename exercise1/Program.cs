@@ -6,7 +6,6 @@ using System.Linq;
 using System;
 public static class Program
 {
-
     public class Category
     {
         public string Name { get; set; }
@@ -16,16 +15,19 @@ public static class Program
         {
 
         }
+
         public Category(string x)
         {
             this.Name = x;
             this.ID = Guid.NewGuid(); ;
         }
+
         public string Display()
         {
             return "this category has a name : " + this.Name;
         }
     }
+
     public class Recipe
     {
         public string Title { get; set; }
@@ -37,6 +39,7 @@ public static class Program
         {
 
         }
+
         public Recipe(string title, string ingredients, string instructions, List<Guid> categories)
         {
             this.Title = title;
@@ -44,6 +47,7 @@ public static class Program
             this.Instructions = instructions;
             this.Categories = categories;
         }
+
         public string Display(Dictionary<Guid, string> categoriesNamesMap)
         {
             string toDisplay = "this receipe is called :" + this.Title + ", to do it we need: " + this.Ingredients + ", the instructions are: " + this.Instructions;
@@ -59,8 +63,8 @@ public static class Program
             toDisplay += "\n\n";
             return toDisplay;
         }
-
     }
+
     public static string Select(string[] choices, string title = "")
     {
         var choice = AnsiConsole.Prompt(new SelectionPrompt<string>()
@@ -70,15 +74,14 @@ public static class Program
         return choice;
     }
 
-
     public static void WriteInFolder(string text, string path)
     {
-
         using (StreamWriter writer = new StreamWriter(path))
         {
             writer.WriteLine(text);
         }
     }
+
     public static string ListCategories(List<Category> categories)
     {
         string categoriesString = "";
@@ -92,6 +95,7 @@ public static class Program
         }
         return categoriesString;
     }
+
     public static string ListRecipes(List<Recipe> receipes, Dictionary<Guid, string> categoriesNamesMap)
     {
         string receipesString = "";
@@ -105,6 +109,7 @@ public static class Program
         }
         return receipesString;
     }
+
     public static void Main(string[] args)
     {
         AnsiConsole.Write(new FigletText("Mena Lateaf").Centered().Color(Color.Grey));
@@ -118,7 +123,6 @@ public static class Program
         var categories = JsonSerializer.Deserialize<List<Category>>(categoriesString);
         Dictionary<string, Guid> categoriesMap = new Dictionary<string, Guid>();
         Dictionary<Guid, string> categoriesNamesMap = new Dictionary<Guid, string>();
-
         for (int i = 0; i < categories.Count; i++)
         {
             categoriesMap[categories[i].Name] = categories[i].ID;
@@ -146,7 +150,7 @@ public static class Program
                             switch (backChoice)
                             {
                                 case "":
-                                    string recipesStringToEdit = ListRecipes(recipes,categoriesNamesMap);
+                                    string recipesStringToEdit = ListRecipes(recipes, categoriesNamesMap);
                                     AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(recipesStringToEdit));
                                     backChoice = Select(new[] { "Back" });
                                     break;
@@ -197,7 +201,7 @@ public static class Program
                             switch (backChoice)
                             {
                                 case "":
-                                    string recipesStringToEdit = ListRecipes(recipes,categoriesNamesMap);
+                                    string recipesStringToEdit = ListRecipes(recipes, categoriesNamesMap);
                                     AnsiConsole.Markup("[white]{0}[/]", Markup.Escape(recipesStringToEdit));
                                     var index = -1;
                                     while (index < 0 || index >= recipes.Count)
